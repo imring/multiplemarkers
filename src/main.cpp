@@ -40,15 +40,21 @@ void multiplemarkers::on_mark(CMenuManager *manager) {
 
     if (!blips.empty()) {
         // check if the cursor is on any marker
-        for (const int blip: blips) {
-            const int   index = CRadar::GetActualBlipArrayIndex(blip);
-            const float dist  = DistanceBetweenPoints(mouse_pos, CRadar::ms_RadarTrace[index].m_vPosition);
+        for (auto it = blips.begin(); it != blips.end();) {
+            const int blip  = *it;
+            const int index = CRadar::GetActualBlipArrayIndex(blip);
+            if (index == -1) { // invalid?
+                it = blips.erase(it);
+                continue;
+            }
+
+            const float dist = DistanceBetweenPoints(mouse_pos, CRadar::ms_RadarTrace[index].m_vPosition);
             if (dist <= 14.f) {
                 remove(manager, blip);
                 return;
             }
+            ++it;
         }
     }
-
     add(manager, mouse_pos);
 }
